@@ -1,0 +1,48 @@
+% Expert System for Diagnosing Health Conditions
+
+% Rules for diagnosis
+diagnosis(cold) :-
+    has_symptom(fever),
+    has_symptom(sore_throat),
+    has_symptom(cough).
+
+diagnosis(flu) :-
+    has_symptom(fever),
+    has_symptom(cough),
+    has_symptom(body_aches).
+
+diagnosis(allergy) :-
+    has_symptom(runny_nose),
+    has_symptom(sneezing),
+    has_symptom(itchy_eyes).
+
+diagnosis(covid19) :-
+    has_symptom(fever),
+    has_symptom(cough),
+    has_symptom(shortness_of_breath),
+    has_symptom(loss_of_taste_or_smell).
+
+% Default case if no match is found
+diagnosis(unknown) :-
+    \+ has_symptom(_).
+
+% Ask user for symptoms
+ask_question(Symptom) :-
+    format('Do you have ~w? (yes/no)~n', [Symptom]),
+    read(Response),
+    (Response == yes -> assert(has_symptom(Symptom)); true).
+
+% Ask all symptoms in the list
+ask_all([]).
+ask_all([Symptom | Rest]) :-
+    ask_question(Symptom),
+    ask_all(Rest).
+
+% Main program
+start :-
+    retractall(has_symptom(_)), % Clear previous symptoms
+    write('Welcome to the Health Diagnosis Expert System!'), nl,
+    Symptoms = [fever, sore_throat, cough, body_aches, runny_nose, sneezing, itchy_eyes, shortness_of_breath, loss_of_taste_or_smell],
+    ask_all(Symptoms),
+    diagnosis(D),
+    format('Based on the symptoms, your diagnosis is: ~w~n', [D]).
